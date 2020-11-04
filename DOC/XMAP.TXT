@@ -1,0 +1,142 @@
+   ________________________________________________________________________
+   name: xmapmake
+   desc: allocate a new xmap struct and buffer
+  
+   type: function
+   args: [in] size:long        | xmap buffer size (max 64K)
+   retn: long                  | far ptr of xmap struct allocated (0 if error)
+  
+   decl: xmapmake& (byval size as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: call `xmap' function to start to peek and/or poke to this map
+  
+   ________________________________________________________________________
+   name: xmap
+   desc: map a memory region (extended or conventional)
+  
+   type: sub
+   args: [in] lin:long,        | region linear address
+              bytes:long,      | region size
+              map:long         | xmap struct to use
+   retn: none
+  
+   decl: xmap (byval lin as long,_
+               byval bytes as long,_
+               byval map as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: the `map' struct must be previously allocated using the
+         `xmapmake' routine
+  
+   ________________________________________________________________________
+   name: xmapflush
+   desc: flush a xmap buffer if need
+  
+   type: sub
+   args: [in] map:long         | xmap struct to flush
+   retn: none
+  
+   decl: xmapflush (byval map as long)
+  
+   updt: 28/03/00 [v1ctor]
+   obs.: this function must be called after poke to memory using the
+         xmappoke_ routines if the region poked will be read by anyothers
+         functions beside the xmappeek_ routines
+
+   ________________________________________________________________________
+   name: xmapinval
+   desc: invalidate a xmap buffer 
+  
+   type: sub
+   args: [in] map:long         | xmap struct to invalidate
+   retn: none
+  
+   decl: xmapinval (byval map as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: this function must be called before peek from memory
+         using the xmappeek_ routines if the region peeked was written
+         by anyothers functions beside xmappoke_ routines)
+  
+   ________________________________________________________________________
+   name: xmappeekb, xmappeeki, xmappeekl, xmappeeks, xmappeekd, xmappeekstr,
+         xmappeekt
+   desc: read a byte, integer, long integer, single, double, string or a
+         structure from extended memory (buffered)
+  
+   type: function
+   args: [in]  map:long,        | map's far ptr
+               ofs:long         | offset of mapped memory block
+   or:   [in]  map:long,        |  "     "   "
+               ofs:long,        |   "    "    "      "      "
+               bytes:integer    | string size
+   or:   [out] struct:any,      | struct to write
+         [in]  map:long,        |  "     "   "
+               ofs:long,        |   "    "    "      "      "
+               bytes:integer    | struct size
+
+   retn: byte, integer, long,\
+         single, double, string | byte, ..., double, or string read
+  
+   decl: xmappeekb%   (byval map as long,_
+                       byval ofs as long)
+         xmappeeki%   (byval map as long,_
+                       byval ofs as long)
+         xmappeekl&   (byval map as long,_
+                       byval ofs as long)
+         xmappeeks!   (byval map as long,_
+                       byval ofs as long)
+         xmappeekd#   (byval map as long,_
+                       byval ofs as long)
+         xmappeekstr$ (byval map as long,_
+                       byval ofs as long,_
+                       byval bytes as integer)
+         xmappeekt    (seg struct as any,_
+                       byval map as long,_
+                       byval ofs as long,_
+                       byval bytes as integer)
+  
+   updt: jul/00 [v1ctor]
+   obs.: the `map' struct must be previously set using the `xmap' routine
+
+   ________________________________________________________________________
+   name: xmappokeb, xmappokei, xmappokel, xmappokes, xmappoked, xmappokestr,
+         xmappoket
+   desc: write a byte, integer, long integer, single, double, string or a
+         structure to extended memory (buffered)
+  
+   type: sub
+   args: [in] map:long,                  | map's far ptr
+              ofs:long,                  | offset of mapped memory block
+              value:byte, integer, long,\
+                    single, double,\
+              struct:any,\
+              strg:string                | value to write
+   retn: none
+  
+   decl: xmappokeb   (byval map as long,_
+                      byval ofs as long,_
+                      byval value as integer)
+         xmappokei   (byval map as long,_
+                      byval ofs as long,_
+                      byval value as integer)
+         xmappokel   (byval map as long,_
+                      byval ofs as long,_
+                      byval value as long)
+         xmappokes   alias "xmappokel" (byval map as long,_
+                      byval ofs as long,_
+                      byval value as single)
+         xmappoked   (byval map as long,_
+                      byval ofs as long,_
+                      byval value as double)
+         xmappokestr (byval map as long,_
+                      byval ofs as long,_
+                      strg as string)
+         xmappoket   (byval map as long,_
+                      byval ofs as long,_
+                      seg struct as any,_
+                      byval bytes as integer)
+  
+   updt: jul/00 [v1ctor]
+   obs.: the `map' struct must be previously set using the `xmap' routine

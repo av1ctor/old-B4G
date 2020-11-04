@@ -1,0 +1,121 @@
+   ________________________________________________________________________
+   name: xfclose
+   desc: close a file previously opened
+  
+   type: sub
+   args: [in] xf:XFILE            | XFILE structure of file to close
+   retn: none
+  
+   decl: xfclose (seg xf as XFILE)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xfflush
+   desc: flush file buffer to disk
+  
+   type: sub
+   args: [in] xf:XFILE            | XFILE structure of file to flush
+   retn: none
+  
+   decl: xfflush (seg xf as XFILE)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xfopen
+   desc: open a existent or create a new file
+  
+   type: function
+   args: [out] xf:XFILE,           | XFILE structure w/ info about the file
+          [in] fname:string,       | file name
+               mode:integer,       | mode (CREATE, APPEND, READ, WRITE)
+               buffer_size:integer | real mode buffer size (0 if use default)
+   retn: integer                   | -1 if ok, 0 otherwise
+  
+   decl: xfopen% (seg xf as XFILE,_
+                  fname as string,_
+                  byval mode as integer,_
+                  byval buffSize as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xfpos
+   desc: get the current file position
+  
+   type: function
+   args: [in] xf:XFILE            | XFILE structure of file to get position
+   retn: long                     | current position (-1 if error)
+  
+   decl: xfpos& (seg xf as XFILE)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xfread
+   desc: read a block of data from a file to memory (extended or
+         conventional)
+  
+   type: function
+   args: [in] xf:XFILE,           | XFILE structure of file to read
+              dst:long,           | linear address of destine memory block
+              bytes:long          | number of bytes to read
+   retn: long                     | number of bytes read (0 if error)
+  
+   decl: xfread& (seg xf as XFILE, byval dst as long,_
+                  byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if destine address is less than 1M, no switch will be made
+
+   ________________________________________________________________________
+   name: xfseek
+   desc: change the file position
+  
+   type: function
+   args: [in] xf:XFILE,           | XFILE structure of file to seek
+              origin:integer,     | seek origin: from start, current or end
+              bytes:long          | distance from origin
+   retn: long                     | position after seek (0 if error)
+  
+   decl: xfseek& (seg xf as XFILE,_
+                  byval origin as integer,_
+                  byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xfsize
+   desc: get the current file size
+  
+   type: function
+   args: [in] xf:XFILE            | XFILE structure of file to get the size
+   retn: long                     | current size (-1 if error)
+  
+   decl: xfsize& (seg xf as XFILE)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xfwrite
+   desc: write a block of data from memory (extended or conventional)
+         to a file
+  
+   type: function
+   args: [in] xf:XFILE,           | XFILE structure of file to write
+              src:long,           | linear address of source memory block
+              bytes:long          | number of bytes to write
+   retn: long                     | number of bytes written (0 if error)
+  
+   decl: xfwrite& (seg xf as XFILE, byval src as long,_
+                   byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if source address is less than 1M, no switch will be made

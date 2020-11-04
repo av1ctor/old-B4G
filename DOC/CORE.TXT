@@ -1,0 +1,234 @@
+   ________________________________________________________________________
+   name: b4ginit
+   desc: load a DPMI server if need, switch to pmode, create descriptors,
+         allocate selectors, return to rmode...
+  
+   type: function
+   args: none
+   retn: integer           | result: B4G.ERROR.HOST (DPMI host not found),
+                                     B4G.ERROR.BIT  (not a 32-bit host),
+                                     B4G.ERROR.MEM  (not enough memory),
+                                     B4G.ERROR.SWT  (cannot switch to pmode)
+                                     or 0 if ok
+  
+   decl: b4ginit% ()
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: b4gdone
+   desc: free allocated conventional and extended memory, close opened files
+  
+   type: sub
+   args: none
+   retn: none
+  
+   decl: b4gdone ()
+  
+   updt: jul/00 [v1ctor]
+   obs.: only need when using B4G in the IDE (qb.exe, qbx.exe or vbdos.exe)
+
+   ________________________________________________________________________
+   name: dpmiDscAlloc
+   desc: allocate one or more LDT descriptors
+  
+   type: function
+   args: [in] descriptors:integer | descriptors to allocate
+   retn: integer                  | first descriptors's selector (0 if error)
+  
+   decl: dpmiDscAlloc% (byval descriptors as integer)
+  
+   obs.: the selectors can be non-continuous; use dpmiSelInc to access next
+  
+   ________________________________________________________________________
+   name: dpmiDscFree
+   desc: free a LDT descriptor previously allocated using dpmiDscAlloc
+         function
+  
+   type: sub
+   args: [in] selector:integer  | descriptor's selector to free
+   retn: none
+  
+   decl: dpmiDscFree (byval selector as integer)
+  
+   ________________________________________________________________________
+   name: dpmiSeg2Dsc
+   desc: convert a real segment to a descriptor
+  
+   type: function
+   args: [in] segm:integer      | segment to convert
+   retn: integer                | sel of the descriptor converted (0 if error)
+  
+   decl: dpmiSeg2Dsc% (byval segm as integer)
+  
+   ________________________________________________________________________
+   name: dpmiSelInc
+   desc: get selector increment value
+  
+   type: function
+   args: none
+   retn: integer                | selector increment
+  
+   decl: dpmiSelInc% ()
+  
+   ________________________________________________________________________
+   name: dpmiSegBaseGet
+   desc: get a descriptor's segment base
+  
+   type: function
+   args: [in] selector:integer  | descriptor's selector to get
+   retn: long                   | segment base (linear address)
+  
+   decl: dpmiSegBaseGet& (byval selector as integer)
+  
+   ________________________________________________________________________
+   name: dpmiSegBaseSet
+   desc: set a descriptor's segment base
+  
+   type: sub
+   args: [in] selector:integer, | descriptor's selector to set
+              linBase:long      | segment base (linear address)
+   retn: none
+  
+   decl: dpmiSegBaseSet (byval selector as integer,_
+                         byval linBase as long)
+  
+   ________________________________________________________________________
+   name: dpmiSegLimitSet
+   desc: set a descriptor's segment limit (size)
+  
+   type: sub
+   args: [in] selector:integer, | descriptor's selector to set
+              limit:long        | segment limit (byte or page granular)
+   retn: none
+  
+   decl: dpmiSegLimitSet (byval selector as integer,_
+                          byval limit as long)
+  
+   ________________________________________________________________________
+   name: dpmiDscRgtsSet
+   desc: set a descriptor's access rights
+  
+   type: sub
+   args: [in] selector:integer, | descriptor's selector to set
+              rights:integer    | access rights
+   retn: none
+  
+   decl: dpmiDscRgtsSet (byval selector as integer,_
+                         byval rights as integer)
+  
+   ________________________________________________________________________
+   name: dpmiCSAlias
+   desc: create a code segment alias descriptor
+  
+   type: function
+   args: [in] selector:integer  | descriptor's selector of type executable
+   retn: integer                | alias sel to a data descriptor (0 if error)
+  
+   decl: dpmiCSAlias% (byval csSel as integer)
+  
+   ________________________________________________________________________
+   name: dpmiDscGet
+   desc: get the contents of a descriptor
+  
+   type: sub
+   args: [in] selector:integer  | descriptor's selector to get
+         [out] dsc:DESCRIPTOR   | descriptor's contents
+   retn: dsc struct filled
+  
+   decl: dpmiDscGet (byval selector as integer,_
+                     dsc as DESCRIPTOR)
+  
+   ________________________________________________________________________
+   name: dpmiDscSet
+   desc: set the contents of a descriptor
+  
+   type: sub
+   args: [in] selector:integer, | descriptor's selector to set
+              dsc:DESCRIPTOR    | descriptor's contents
+   retn: none
+  
+   decl: dpmiDscSet (byval selector as integer,_
+                     dsc as DESCRIPTOR)
+  
+   ________________________________________________________________________
+   name: dpmiAllocSpcDsc
+   desc: allocate a specific LDT descriptor
+  
+   type: function
+   args: [in] selector:integer  | descriptor's selector to allocate
+   retn: integer                | 0 if error, -1 otherwise
+  
+   decl: dpmiAllocSpcDsc% (selector as integer)
+  
+   ________________________________________________________________________
+   name: dpmiGetInfo
+   desc: get info about the DPMI host
+  
+   type: sub
+   args: [out] info:DPMIINFO    | structure to receive the info
+   retn: info struct filled
+  
+   decl: dpmiGetInfo (seg info as DPMIINFO)
+  
+   ________________________________________________________________________
+   name: dpmiRegLock
+   desc: lock a specified linear address range of extended memory
+  
+   type: sub
+   args: [in] linBase:long,     | linear base of memory to lock
+              bytes:long        | number of bytes to lock
+   retn: none
+  
+   decl: dpmiRegLock (byval linBase as long,_
+                      byval bytes as long)
+  
+   ________________________________________________________________________
+   name: dpmiRegUnLock
+   desc: unlock a specified linear address range of extended memory
+         previously locked using dpmiRegLock function
+  
+   type: sub
+   args: [in] linBase:long,     | linear base of memory to unlock
+              bytes:long        | number of bytes to unlock
+   retn: none
+  
+   decl: dpmiRegUnLock (byval linBase as long,_
+                        byval bytes as long)
+  
+   ________________________________________________________________________
+   name: dpmiPhysMap
+   desc: map a physical address region of extended memory to
+         linear address
+  
+   type: sub
+   args: [in] physBase:long,    | physical base of memory to map
+              bytes:long        | number of bytes to map
+   retn: long                   | lin addrs of memory mapped (used to access)
+  
+   decl: dpmiPhysMap& (byval physBase as long,_
+                       byval bytes as long)
+  
+
+   updt: oct/00 [v1ctor]
+   obs.: for more details, see the DPMI specification (doc/dpmi09.txt)
+
+   ________________________________________________________________________
+   name: interrupt386, interrupt386x
+   desc: invoke a 32-bit protected mode interrupt
+  
+   type: sub
+   args:          intnum:integer, | interrupt to invoke
+         [IN/OUT] regs:REGS386    | struct of registers to pass to interrupt
+   retn: none
+  
+   decl: interrupt386  (byval intnum as integer,_
+                        seg regs as REGS386)
+         interrupt386x (byval intnum as integer,_
+                        seg regs as REGS386)
+  
+   updt: oct/00 [v1ctor]
+   obs.: the difference between interrupt386 and interrupt386x is that the
+         last passes (and returns) the DS & ES selectors to (from) the
+         interrupt invoked

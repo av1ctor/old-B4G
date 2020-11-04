@@ -1,0 +1,50 @@
+##
+## make file to create b4g(x||v).lib & b4g(x||v).qlb
+##
+
+.SUFFIXES:
+
+!if     ("$(MAKE2)"=="QB")
+QLBLIB  = bqlb45.lib
+B4GLIB  = ..\lib\b4g
+!else
+!if     ("$(MAKE2)"=="QBX")
+QLBLIB  = qbxqlb.lib
+B4GLIB  = ..\lib\b4gx
+!else
+QLBLIB  = vbdosqlb.lib
+B4GLIB  = ..\lib\b4gv
+!endif
+!endif
+
+LIBCMD  = lib /NOI
+LINKCMD = link /q
+              
+SRC     = .\core\core.mak .\xmem\xmem.mak .\xmap\xmap.mak\
+          .\xfile\xfile.mak .\mem\mem.mak
+
+
+all:            source $(B4GLIB).qlb
+
+source:         $(SRC)
+                @<<batmake.bat
+                @echo off
+                if "%1~"=="~" goto end
+                cd %1
+                nmake /f %2
+                cd ..
+                :end
+<<
+                !batmake.bat $(**D) $(**F)
+                
+$(B4GLIB).lib:  $(SRC:.mak=.lib)
+                if exist $@ del $@
+                $(LIBCMD) $@ @<<
+                +$(?: = &^
+                +)
+                ;
+<<
+                !if exist $** del $**
+
+$(B4GLIB).qlb:  $(B4GLIB).lib
+                $(LINKCMD) $(B4GLIB).lib,$@,nul,$(QLBLIB);

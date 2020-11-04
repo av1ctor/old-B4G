@@ -1,0 +1,77 @@
+   ________________________________________________________________________
+   name: farptr
+   desc: return a segment:offset as a far pointer
+  
+   type: function
+   args: [in] segm:integer,    | far pointer segment part
+              offs:integer     |  "     "    offset   "
+   retn: long                  | far pointer
+  
+   decl: farptr&   (byval segm as integer,_
+                    byval offs as integer)
+     or: farptrex& alias "farptr" (seg array as any)
+  
+   ________________________________________________________________________
+   name: segment or offset
+   desc: returns a segment or offset of a far pointer
+  
+   type: function
+   args: [in] fptr:long        | far pointer
+   retn: integer or long       | segment or offset of fptr
+  
+   decl: segment% alias "_segment" (byval fptr as long)
+         offset&  alias "_offset"  (byval fptr as long)
+
+   ________________________________________________________________________
+   name: malloc
+   desc: allocate a conventional memory block
+  
+   type: function
+   args: [in] bytes:long       | number of bytes to allocate
+   retn: long                  | far pointer of block (0 if error)
+  
+   decl: malloc& (byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: mavail
+   desc: return the largest free conventional memory block size
+  
+   type: function
+   args: none
+   retn: long                  | largest free block size
+  
+   decl: mavail& ()
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: mfree
+   desc: free a conventional memory block
+  
+   type: sub
+   args: [in/out] fptr:long    | memory block far pointer
+   retn: none
+  
+   decl: mfree (seg fptr as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if block exists, fptr will be set to NULL
+
+   ________________________________________________________________________
+   name: mrealloc
+   desc: resize a conventional memory block previously allocated
+  
+   type: function
+   args: [in/out] fptr:long     | far pointer of block to resize
+         [in] bytes:long        | new block size in bytes
+   retn: integer                | result: 0 if ok, DOS error code otherwise
+  
+   decl: mrealloc% (seg blk as long,_
+                    byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none

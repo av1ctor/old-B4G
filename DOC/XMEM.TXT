@@ -1,0 +1,195 @@
+   ________________________________________________________________________
+   name: linear
+   desc: convert a far pointer (segment:offset) to linear address
+  
+   type: function
+   args: [in] segm:integer,    | far pointer segment part
+              offs:integer     |  "     "    offset   "
+   retn: long                  | linear address
+  
+   decl: linear&   (byval segm as integer,_
+                    byval offs as integer)
+     or: linearex& alias "linear" (seg array as any)
+     or: fp2lin&   alias "linear" (byval fptr as long)
+
+   ________________________________________________________________________
+   name: xmcalloc
+   desc: allocate an extended memory block and clear it (fill with zeros)
+  
+   type: function
+   args: [in] bytes:long       | number of bytes to alloc and clear
+   retn: long                  | linear address of block (0 if error)
+  
+   decl: xmcalloc& (byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xmavail
+   desc: get the size of the largest extended memory block free
+  
+   type: function
+   args: none
+   retn: long                  | largest free block size
+  
+   decl: xmavail& ()
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xmcalloc
+   desc: allocate an extended memory block and clear it (fill with zeros)
+  
+   type: function
+   args: [in] bytes:long       | number of bytes to alloc and clear
+   retn: long                  | linear address of block (0 if error)
+  
+   decl: xmcalloc& (byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
+
+   ________________________________________________________________________
+   name: xmfill
+   desc: fill a memory block with a character
+
+   type: sub
+   args: [in] blk:long,        | linear address of block to fill
+              bytes:long,      | number of bytes to fill
+              char:integer     | fill character
+   retn: none
+  
+   decl: xmfill (byval blk as long,_
+                 byval bytes as long,_
+                 byval char as integer)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if address is less than 1M, no switch will be made
+
+   ________________________________________________________________________
+   name: xmfree
+   desc: free an extended memory block
+  
+   type: sub
+   args: [in/out] blk:long     | linear address of block to free
+   retn: none
+  
+   decl: xmfree (seg blk as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if block exists, blk will be set to NULL
+
+   ________________________________________________________________________
+   name: xmmove
+   desc: move a memory block to another
+  
+   type: sub
+   args: [in] src:long,        | linear address of source block
+              bytes:long,      | number of bytes to move
+              dst:long         | linear address of destine block
+   retn: none
+  
+   decl: xmmove (byval src as long,_
+                 byval bytes as long,_
+                 byval dst as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: the source and destine can overlap
+         if source and destine are less than 1M, no switch will be made
+
+   ________________________________________________________________________
+   name: xmmovefill
+   desc: move a memory block to another and fill source 
+  
+   type: sub
+   args: [in] src:long,        | linear address of source block
+              bytes:long,      | number of bytes to move and fill
+              dst:long,        | linear address of destine block
+              char:integer     | character to fill source
+   retn: none
+  
+   decl: xmmovefill (byval src as long,_
+                     byval bytes as long,_
+                     byval dst as long,_
+                     byval char as integer)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if source and destine are less than 1M, no switch will be made
+
+   ________________________________________________________________________
+   name: xmpeekb, xmpeeki, xmpeekl, xmpeeks, xmpeekd, xmpeekstr, xmpeekt
+   desc: get a byte, integer, long integer, single, double, string or
+         a structure from memory
+  
+   type: function
+   args: [in]  src:long         | linear address of source
+     or: [in]  src:long,        |   "       "         "
+               bytes:integer    | string size
+     or: [out] struct:any,      | struct to write
+         [in]  src:long,        |   "       "         "
+               bytes:integer    | string size
+   retn: byte, integer, long,\
+         single, double, string | byte, ..., double, or string read
+  
+   decl: xmpeekb%   (byval src as long)
+         xmpeeki%   (byval src as long)
+         xmpeekl&   (byval src as long)
+         xmpeeks!   (byval src as long)
+         xmpeekd#   (byval src as long)
+         xmpeekstr$ (byval src as long,_
+                     byval bytes as integer)
+         xmpeekt    (seg struct as any,_
+                     byval src as long,_
+                     byval bytes as integer)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if source is less than 1M, no switch will be made
+
+   ________________________________________________________________________
+   name: xmpokeb, xmpokei, xmpokel, xmpokes, xmpoked, xmpokestr, xmpoket
+   desc: write a byte, integer, long integer, single, double, string
+         or a structure to memory
+  
+   type: sub
+   args: [in] dst:long,             | linear address of destine
+              value:integer, long,\
+                    single, double,\
+              struct:any,\
+              strg:string           | byte, ..., struct, or string to write
+   retn: none
+  
+   decl: xmpokeb   (byval dst as long,_
+                    byval value as integer)
+         xmpokei   (byval dst as long,_
+                    byval value as integer)
+         xmpokel   (byval dst as long,_
+                    byval value as long)
+         xmpokes   alias "xmpokel" (byval dst as long,_
+                    byval value as single)
+         xmpoked   (byval dst as long,_
+                    byval value as double)
+         xmpokestr (byval dst as long,_
+                    strg as string)
+         xmpoket   (byval dst as long,_
+                    seg struct as any,_
+                    byval bytes as integer)
+  
+   updt: jul/00 [v1ctor]
+   obs.: if destine is less than 1M, no switch will be made
+
+   ________________________________________________________________________
+   name: xmrealloc
+   desc: resize an extended memory block previously allocated
+  
+   type: function
+   args: [in/out] blk:long     | linear address of block to resize
+         [in] bytes:long       | new block size
+   retn: integer               | result: -1 if error, 0 otherwise
+  
+   decl: xmrealloc% (seg blk as long,_
+                     byval bytes as long)
+  
+   updt: jul/00 [v1ctor]
+   obs.: none
